@@ -1,0 +1,114 @@
+using System;
+using System.IO;
+using System.Windows.Forms;
+
+namespace BlocoDeNotas
+{
+    public partial class Form1 : Form
+    {
+        // Variável para armazenar o caminho do arquivo atual
+        private string arquivoAtual = string.Empty;
+
+        public Form1()
+        {
+            InitializeComponent();
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            // Configuração inicial do Form (opcional)
+            this.Text = "Bloco de Notas";
+        }
+
+        // Evento para Novo arquivo
+        private void novoToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (MessageBox.Show("Você tem certeza que deseja criar um novo arquivo? As alterações não salvas serão perdidas.", "Novo Arquivo", MessageBoxButtons.YesNo) == DialogResult.Yes)
+            {
+                richTextBox1.Clear();
+                arquivoAtual = string.Empty;
+            }
+        }
+
+        // Evento para abrir arquivo
+        private void abrirToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog abrirArquivoDialog = new OpenFileDialog();
+            abrirArquivoDialog.Filter = "Arquivos de Texto|*.txt";
+            abrirArquivoDialog.Title = "Abrir Arquivo";
+
+            if (abrirArquivoDialog.ShowDialog() == DialogResult.OK)
+            {
+                try
+                {
+                    richTextBox1.Text = File.ReadAllText(abrirArquivoDialog.FileName);
+                    arquivoAtual = abrirArquivoDialog.FileName;
+                    this.Text = "Bloco de Notas - " + Path.GetFileName(arquivoAtual);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Erro ao abrir o arquivo: " + ex.Message);
+                }
+            }
+        }
+
+        // Evento para salvar arquivo
+        private void salvarToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (string.IsNullOrEmpty(arquivoAtual))
+            {
+                salvarComoToolStripMenuItem_Click(sender, e);
+            }
+            else
+            {
+                try
+                {
+                    File.WriteAllText(arquivoAtual, richTextBox1.Text);
+                    MessageBox.Show("Arquivo salvo com sucesso!");
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Erro ao salvar o arquivo: " + ex.Message);
+                }
+            }
+        }
+
+        // Evento para salvar como
+        private void salvarComoToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            SaveFileDialog salvarArquivoDialog = new SaveFileDialog();
+            salvarArquivoDialog.Filter = "Arquivos de Texto|*.txt";
+            salvarArquivoDialog.Title = "Salvar Arquivo Como";
+
+            if (salvarArquivoDialog.ShowDialog() == DialogResult.OK)
+            {
+                try
+                {
+                    File.WriteAllText(salvarArquivoDialog.FileName, richTextBox1.Text);
+                    arquivoAtual = salvarArquivoDialog.FileName;
+                    this.Text = "Bloco de Notas - " + Path.GetFileName(arquivoAtual);
+                    MessageBox.Show("Arquivo salvo com sucesso!");
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Erro ao salvar o arquivo: " + ex.Message);
+                }
+            }
+        }
+
+        // Evento para sair
+        private void sairToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (MessageBox.Show("Você tem certeza que deseja sair? As alterações não salvas serão perdidas.", "Sair", MessageBoxButtons.YesNo) == DialogResult.Yes)
+            {
+                Application.Exit();
+            }
+        }
+
+        // Evento para editar texto (se necessário)
+        private void richTextBox1_TextChanged(object sender, EventArgs e)
+        {
+            // Código para tratar alterações no texto, se necessário
+        }
+    }
+}
